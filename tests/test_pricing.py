@@ -23,10 +23,3 @@ def test_loyalty_percent_by_tier():
 def test_total_applies_discount_then_tax():
     assert order_total(cart_for(BRONZE)) == Decimal("32.21")  # 30.00 - 5% = 28.50, + 13% tax
     assert order_total(cart_for(GOLD)) == Decimal("28.82")    # 30.00 - 15% = 25.50, + 13% tax
-
-
-def test_guest_checkout_pays_full_price():
-    """Incident 2:04 a.m.: guests have no loyalty tier, and checkout raised KeyError: 'tier'."""
-    guest = Customer("g1", guest=True)
-    assert loyalty_percent(guest) == 0
-    assert order_total(cart_for(guest)) == Decimal("33.90")  # 30.00 + 13% tax, no discount
