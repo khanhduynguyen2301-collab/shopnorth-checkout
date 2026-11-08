@@ -15,9 +15,9 @@ def subtotal(cart: Cart) -> Decimal:
 
 
 def loyalty_percent(customer: Customer) -> int:
-    """Loyalty members get a discount by tier."""
-    tier = customer.profile["tier"]
-    return LOYALTY_PERCENT[tier]
+    """Loyalty members get a discount by tier. Guests and unknown tiers get no discount."""
+    tier = customer.profile.get("tier")
+    return LOYALTY_PERCENT.get(tier, 0)
 
 
 def order_total(cart: Cart) -> Decimal:
