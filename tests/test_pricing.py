@@ -1,7 +1,10 @@
 from decimal import Decimal
 
 from checkout.models import Cart, Customer, Item
-from checkout.pricing import order_total, subtotal
+from checkout.pricing import loyalty_percent, order_total, subtotal
+
+BRONZE = Customer("c1", profile={"tier": "bronze"})
+GOLD = Customer("c2", profile={"tier": "gold"})
 
 
 def cart_for(customer: Customer) -> Cart:
@@ -9,8 +12,14 @@ def cart_for(customer: Customer) -> Cart:
 
 
 def test_subtotal_adds_up_items():
-    assert subtotal(cart_for(Customer("c1"))) == Decimal("30.00")
+    assert subtotal(cart_for(BRONZE)) == Decimal("30.00")
 
 
-def test_total_adds_tax():
-    assert order_total(cart_for(Customer("c1"))) == Decimal("33.90")
+def test_loyalty_percent_by_tier():
+    assert loyalty_percent(BRONZE) == 5
+    assert loyalty_percent(GOLD) == 15
+
+
+def test_total_applies_discount_then_tax():
+    assert order_total(cart_for(BRONZE)) == Decimal("32.21")  # 30.00 - 5% = 28.50, + 13% tax
+    assert order_total(cart_for(GOLD)) == Decimal("28.82")    # 30.00 - 15% = 25.50, + 13% tax
